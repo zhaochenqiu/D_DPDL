@@ -1,0 +1,10 @@
+% left = 160;
+% top  = 1;
+% right = 300;
+% bottom = 80;
+% 
+% im = im(top:bottom, left:right, :);
+% gt = gt(top:bottom, left:right, :);
+% fg = fg(top:bottom, left:right, :);
+
+

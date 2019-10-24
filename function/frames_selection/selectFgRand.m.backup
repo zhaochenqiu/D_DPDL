@@ -1,0 +1,56 @@
+function [re_idxes re_rates] = selectFgRand(fg_pa, fg_ft, num, rate)
+
+
+if nargin == 2
+    num = 2;
+    rate = 1;
+end
+
+if nargin == 3
+    rate = 1;
+end
+
+[fs_im fullfs_im] = loadFiles_plus(fg_pa, fg_ft);
+
+im = double(imread(fullfs_im{1}));
+[row_im column_im byte_im] = size(im);
+
+
+
+frames = max(size(fullfs_im));
+
+mat = zeros(frames, 2);
+
+for i = 1:frames
+    fgim = double(imread(fullfs_im{i}));
+    
+    idx_fg = fgim == 255;
+    idx_bk = fgim == 0;
+
+    fgval = sum(sum(idx_fg));
+    bkval = sum(sum(idx_bk));
+
+    mat(i, 1) = fgval;
+    mat(i, 2) = bkval;
+end
+
+list = mat(:, 1);
+val = mean(list(list ~= 0));
+
+pos = find(list > val*rate);
+
+pos_peak = getFgPeakFrames_rand(fg_pa, fg_ft, 10000000, 10);
+pos_peak
+
+sort(pos_peak)
+
+pos_potential = intersect(pos, pos_peak);
+pos = pos_potential;
+
+
+pos = pos(randperm(numel(pos)));
+pos = pos(randperm(numel(pos)));
+pos = pos(randperm(numel(pos)));
+
+re_idxes = pos(1:num);
+re_rates = [];

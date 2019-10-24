@@ -1,0 +1,126 @@
+function re_imdb = getMultiRPoTP(im_pa, im_ft, gt_pa, gt_ft, list_idx, num, mode, flag)
+
+if nargin == 1
+    flag == 'get';
+end
+
+if nargin == 6
+    mode = 'test';
+end
+
+
+global m_getMultiRPoTP_im_pa;
+global m_getMultiRPoTP_im_ft;
+global m_getMultiRPoTP_gt_pa;
+global m_getMultiRPoTP_gt_ft;
+global m_getMultiRPoTP_list_idx;
+global m_getMultiRPoTP_num;
+global m_getMultiRPoTP_mode;
+
+
+global g_imdb_start;
+
+global g_flag_endstart;
+
+
+
+if flag == 'set'
+    re_imdb = [];
+    m_getMultiRPoTP_im_pa    = im_pa;
+    m_getMultiRPoTP_im_ft    = im_ft;
+    m_getMultiRPoTP_gt_pa    = gt_pa;
+    m_getMultiRPoTP_gt_ft    = gt_ft;
+    m_getMultiRPoTP_list_idx = list_idx;
+    m_getMultiRPoTP_num      = num;
+    m_getMultiRPoTP_mode     = mode;
+else
+    im_pa      = m_getMultiRPoTP_im_pa;
+    im_ft      = m_getMultiRPoTP_im_ft;
+    gt_pa      = m_getMultiRPoTP_gt_pa;
+    gt_ft      = m_getMultiRPoTP_gt_ft;
+    list_idx   = m_getMultiRPoTP_list_idx;
+    num        = m_getMultiRPoTP_num;
+    mode       = m_getMultiRPoTP_mode;
+
+
+
+    global g_iteration_count;
+
+    if g_iteration_count > 1
+
+
+        global g_diff_list
+        
+        fg_pa = gt_pa;
+        fg_ft = 'png';
+
+        fg_pa = fg_pa(1:end - 7);
+        fg_pa = [fg_pa 'net2fg/'];
+
+        gt_pa = '/home/cqzhao/dataset/dataset2014/dataset/dynamicBackground/fountain01/groundtruth/';
+        if isempty(g_diff_list)
+
+            fg_pa
+            gt_pa
+
+            list = getDiff(fg_pa, fg_ft, gt_pa, gt_ft);
+            list
+            poslist = find(list > mean(list));
+            poslist = poslist(randperm(max(size(poslist))));
+
+            num_retrain = 20;
+            frames_idxs = poslist(1:num_retrain);
+
+            g_diff_list = frames_idxs;
+        else
+            frames_idxs = g_diff_list;
+        end
+
+        frames_idxs
+
+        imdb_set = {};
+        for i = 1:max(size(frames_idxs));
+            imdb = getImdb_byDiff(im_pa, im_ft, fg_pa, fg_ft, gt_pa, gt_ft, frames_idxs(i), num);
+
+            imdb_set = {imdb_set{:}, imdb};
+
+            str = sprintf('generating Imdb_diff %i', i);
+
+            display(str);
+%            disp(str)
+        end
+
+        imdb = mixImdb(imdb_set{:});
+
+        re_imdb = mixImdb(g_imdb_start, imdb);
+
+        disp('capture the different imdb')
+        sum(sum(re_imdb.images.labels == 255))
+        sum(sum(re_imdb.images.labels == 1))
+        disp('number of imdb')
+
+    else
+        len = max(size(list_idx));
+
+        imdb_set = {};
+        for i = 1:len
+            imdb = getRPoTP(im_pa, im_ft, gt_pa, gt_ft, list_idx(i), num, mode);
+            
+            imdb_set = {imdb_set{:}, imdb};
+        end
+
+
+        re_imdb = mixImdb(imdb_set{:});
+
+        if isempty(g_flag_endstart) ~= 1
+            re_imdb = mixImdb(re_imdb, g_imdb_start);
+            disp('mixing the original imdb')
+        end
+
+        sum(sum(re_imdb.images.labels == 255))
+        sum(sum(re_imdb.images.labels == 1))
+        disp('number of imdb')
+    end
+end
+
+

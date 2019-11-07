@@ -19,3 +19,6 @@ This is the code for our paper "Dynamic Deep Pixel Distribution Learning for Bac
 ## Requirements
 * Matlab
 * Matconvnet
+
+## Demonstration
+!()[https://youtu.be/gWi7gVFPIBY]

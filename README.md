@@ -25,4 +25,4 @@ This is the code for our paper "Dynamic Deep Pixel Distribution Learning for Bac
 After initialization of [Matconvnet](http://www.vlfeat.org/matconvnet/) and downloading [CDNet dataset](http://changedetection.net/), please execute "run_baseline.m" to run the program.
 
 ## Demonstration
-A vide demonstration is available on [here](https://youtu.be/gWi7gVFPIBY)
+A vide demonstration is available on [here](https://youtu.be/gWi7gVFPIBY).
